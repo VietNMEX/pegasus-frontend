@@ -38,6 +38,7 @@ import android.os.Environment;
 import android.os.storage.StorageManager;
 import android.os.storage.StorageVolume;
 import android.provider.Settings;
+import android.view.KeyEvent;
 import androidx.core.content.FileProvider;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -63,6 +64,25 @@ public class MainActivity extends org.qtproject.qt5.android.bindings.QtActivity 
 
         ActivityManager am = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
         m_icon_density = am.getLauncherLargeIconDensity();
+    }
+
+
+    // Arcade panels (e.g. Arcade1Up) send BUTTON_C and BUTTON_Z for two of the
+    // six attack buttons. Qt's gamepad support has no C/Z buttons, so those
+    // presses are lost. Remap them to L1/R1 so they can be used in Pegasus.
+    // This only affects Pegasus itself; launched games still see C/Z.
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent e) {
+        int code = e.getKeyCode();
+        int mapped = code;
+        if (code == KeyEvent.KEYCODE_BUTTON_C) mapped = KeyEvent.KEYCODE_BUTTON_L1;
+        else if (code == KeyEvent.KEYCODE_BUTTON_Z) mapped = KeyEvent.KEYCODE_BUTTON_R1;
+        if (mapped != code) {
+            e = new KeyEvent(e.getDownTime(), e.getEventTime(), e.getAction(), mapped,
+                e.getRepeatCount(), e.getMetaState(), e.getDeviceId(), e.getScanCode(),
+                e.getFlags(), e.getSource());
+        }
+        return super.dispatchKeyEvent(e);
     }
 
 
