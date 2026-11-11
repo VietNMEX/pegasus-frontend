@@ -72,6 +72,11 @@ void FrontendLayer::rebuild()
     m_engine->rootContext()->setContextProperty(QStringLiteral("api"), m_api_public);
     m_engine->rootContext()->setContextProperty(QStringLiteral("Api"), m_api_public);
     m_engine->rootContext()->setContextProperty(QStringLiteral("Internal"), m_api_private);
+    // How many times the UI was loaded since Pegasus started: 1 on a fresh
+    // start, higher when coming back from a game. Lets themes tell a cold
+    // boot apart from returning from a game.
+    m_load_count++;
+    m_engine->rootContext()->setContextProperty(QStringLiteral("pegasusLoadCount"), m_load_count);
     m_engine->load(QUrl(QStringLiteral("qrc:/frontend/main.qml")));
 
     emit rebuildComplete();
